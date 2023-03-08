@@ -1,22 +1,21 @@
---- CONFIG ---
+--- Config ---
 webhookURL = ''
-prefix = '^5[^1911^5] ^3';
+prefix = '^1[911] ^7';
 roleList = {
-    "SAHP",
+    "SAST",
     "BCSO",
-    "BCPD",
-    "CO",
-    "EMS",
+    "LSPD",
+    "USBP",
+    "SAFR",
 }
 
-
-
---- CODE ---
+--- Code ---
 function sendMsg(src, msg)
     TriggerClientEvent('chat:addMessage', src, {
         args = { prefix .. msg }
     })
 end
+
 function sendToDisc(title, message, footer)
     local embed = {}
     embed = {
@@ -29,28 +28,24 @@ function sendToDisc(title, message, footer)
             },
         }
     }
-    -- Start
-    -- TODO Input Webhook
     PerformHttpRequest(webhookURL, 
     function(err, text, headers) end, 'POST', json.encode({username = name, embeds = embed}), { ['Content-Type'] = 'application/json' })
-  -- END
 end
+
 isCop = {}
-AddEventHandler('playerDropped', function (reason) 
-  -- Clear their lists 
+AddEventHandler('playerDropped', function(reason) 
   local src = source;
   isCop[src] = nil;
 end)
 
-RegisterNetEvent('Badger-911:CheckPerms')
-AddEventHandler('Badger-911:CheckPerms', function()
+RegisterNetEvent('d911:check-permissions')
+AddEventHandler('d911:check-permissions', function()
     local src = source;
     for k, v in ipairs(GetPlayerIdentifiers(src)) do
         if string.sub(v, 1, string.len("discord:")) == "discord:" then
             identifierDiscord = v
         end
     end
-    -- TriggerClientEvent("FaxDisVeh:CheckPermission:Return", src, true, false)
 
 if identifierDiscord then
     local roleIDs = exports.Badger_Discord_API:GetDiscordRoles(src)
@@ -59,12 +54,12 @@ if identifierDiscord then
             for j = 1, #roleIDs do
                 if exports.Badger_Discord_API:CheckEqual(roleList[i], roleIDs[j]) then
                     isCop[tonumber(src)] = true;
-                    print("[911]" .. GetPlayerName(src) .. " received Badger-911 permissions SUCCESS")
+                    print("[d911] " .. GetPlayerName(src) .. " has received permissions to view emergency calls.")
                 end
             end
         end
     else
-        print(GetPlayerName(src) .. " did not receive permissions because roles == false")
+        print("[d911] " .. GetPlayerName(src) .. " did not receive permissions to view emergency calls.")
     end
 elseif identifierDiscord == nil then
     print("identifierDiscord == nil")
@@ -76,26 +71,28 @@ idCounter = 0;
 function mod(a, b)
     return a - (math.floor(a/b)*b)
 end
+
 RegisterCommand("resp", function(source, args, raw)
     if (#args > 0) then 
         if tonumber(args[1]) ~= nil then 
             if locationTracker[tonumber(args[1])] ~= nil then 
                 -- It is valid, set their waypoint 
                 local loc = locationTracker[tonumber(args[1])]
-                TriggerClientEvent("Badger-911:SetWaypoint", source, loc[1], loc[2]);
+                TriggerClientEvent("d911:set-waypoint", source, loc[1], loc[2]);
                 sendMsg(source, "Your waypoint has been set to the situation!")
             else 
                 -- Not valid 
-                sendMsg(source, "^1ERROR: That is not a valid situation...")
+                sendMsg(source, "^1That is not a valid situation.")
             end
         else 
             -- Not a valid number 
-            sendMsg(source, "^1ERROR: That is not a valid number you supplied...")
+            sendMsg(source, "^1That is not a valid number you supplied.")
         end
     end
 end)
-RegisterCommand("911", function(source, args, raw)
-    -- /911 command 
+RegisterCommand("911", function(s
+           ource, args, raw)
+    -- 11 command 
     local x, y, z = table.unpack(GetEntityCoords(GetPlayerPed(source)));
     if (#args > 0) then 
         idCounter = idCounter + 1;
