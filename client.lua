@@ -1,9 +1,8 @@
 Citizen.CreateThread(function()
-	TriggerServerEvent('Badger-911:CheckPerms')
+	TriggerServerEvent('d911:check-permissions')
 end)
 
-RegisterNetEvent("Badger-911:SetWaypoint")
-AddEventHandler("Badger-911:SetWaypoint", function(x, y)
-	-- Set the waypoint for this player
+RegisterNetEvent("d911:set-waypoint")
+AddEventHandler("d911:set-waypoint", function(x, y)
 	SetNewWaypoint(x, y)
 end)
