@@ -90,9 +90,8 @@ RegisterCommand("resp", function(source, args, raw)
         end
     end
 end)
-RegisterCommand("911", function(s
-           ource, args, raw)
-    -- 11 command 
+
+RegisterCommand("911", function(source, args, raw)
     local x, y, z = table.unpack(GetEntityCoords(GetPlayerPed(source)));
     if (#args > 0) then 
         idCounter = idCounter + 1;
@@ -107,13 +106,13 @@ RegisterCommand("911", function(s
             idCounter = 1;
             locationTracker[idCounter] = {x, y};
         end
-        sendMsg(source, "Your 911 call has been received! The authorities are on their way!");
+        sendMsg(source, "Your call has been submitted!");
         sendToDisc("[RESPONSE CODE: " .. idCounter .. "] " ..
          "INCOMING TRANSMISSION:", table.concat(args, " "), "[" .. source .. "] " .. GetPlayerName(source))
         for _, id in ipairs(GetPlayers()) do 
             if isCop[tonumber(id)] ~= nil and isCop[tonumber(id)] == true then 
                 -- They are a cop, send them it 
-                sendMsg(id, "[^7Use ^2/resp " .. idCounter .. "^7 to respond^3] " .. "^1INCOMING TRANSMISSION: ^3" .. table.concat(args, " "));
+                sendMsg(id, "[Emergency Call: Please execute ^7/resp " .. idCounter .. " ^1to respond.] " .. table.concat(args, " "));
             end
         end
     end
